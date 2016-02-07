@@ -8,4 +8,4 @@ O plugin utiliza as teclas `<F9>` e `<F10>`, sendo respectivamente para compilar
 ##Autor
 `Daniel B. Brumazzi`
 
-`vim utilite`
+`vim Utility`
