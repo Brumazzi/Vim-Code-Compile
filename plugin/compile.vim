@@ -59,6 +59,7 @@ function MakeFileBuild()
 		let _c = 0
 		while _c < len(g:src)
 			call add(lines, "ADD_EXECUTABLE(".g:out[_c]." ${".toupper(g:out[_c])."})")
+			let _c += 1
 		endwhile
 "	elseif g:make == "make"
 	endif
