@@ -64,6 +64,9 @@ function MakeFileBuild()
 "	elseif g:make == "make"
 	endif
 	call writefile(lines, "CMakeLists.txt")
+
+	echo "CMakeLists.txt generated!"
+	! cmake CMakeLists.txt && make
 endfunction
 
 " Define Indent Lang: {{{1
