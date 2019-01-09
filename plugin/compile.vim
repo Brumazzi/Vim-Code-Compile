@@ -31,9 +31,10 @@ endif
 "
 " if use makefile
 " let g:make = "make"
+" let g:compiler = "gcc"
 " let g:libs = "-lm -lX11"
-" let g:path = "/usr/include/lib/inc/ headers/"
-" let g:cflags = "-O3 -Wall"
+" let g:path = "-I /usr/include/lib/inc/ -I headers/"
+" let g:flags = "-O3 -Wall"
 " let g:src = ["a.c", "b.c", "c.c", "z.c", "y.c", "x.c"]
 " let g:out = ["out"]
 
@@ -61,15 +62,35 @@ function MakeFileBuild()
 			call add(lines, "ADD_EXECUTABLE(".g:out[_c]." ${".toupper(g:out[_c])."})")
 			let _c += 1
 		endwhile
-"	elseif g:make == "make"
-	endif
-	call writefile(lines, "CMakeLists.txt")
+		call writefile(lines, "CMakeLists.txt")
 
-	echo "CMakeLists.txt generated!"
-	! cmake CMakeLists.txt && make
+		echo "CMakeLists.txt generated!"
+		! cmake CMakeLists.txt && make
+	elseif g:make == "make"
+		let src_files = ""
+		call add(lines, "COMPILER=".g:compiler)
+		call add(lines, "LIBS=".g:libs)
+		call add(lines, "PATHS=".g:path)
+		call add(lines, "FLAGS=".g:flags)
+		call add(lines, "OUTPUT=".g:out)
+
+		call add(lines, "")
+		call add(lines, "build:")
+		let _c = 0
+		while _c < len(g:src)
+			call add(lines, "	${COMPILER} ${FLAGS} ${LIBS} ${PATHS} -c ".g:src[_c])
+			let src_files .= g:src[_c]." "
+			let _c += 1
+		endwhile
+		call add(lines, "	${COMPILER} ${FLAGS} ${LIBS} ${PATHS} -o ${OUTPUT} *.o")
+
+		call writefile(lines, "Makefile")
+		echo "Makefile generated!"
+		! make
+	endif
 endfunction
 
-" Define Indent Lang: {{{1
+" Select language type {{{1
 function Runner()
 	w
 	let ext = &filetype
@@ -91,7 +112,8 @@ function Runner()
 		echo &filetype." no suported!"
 	endif
 endfunction
-
+" }}}
+" Compile functions {{{
 function CCompile()
 	echo "c file compiling..."
 	let $_cc = "cc ".expand("%:p")." -o ".expand("%:p:r")
@@ -134,6 +156,6 @@ function ShRun()
 	let $_sh = "sh ".expand("%:p")
 	! time $_sh
 endfunction
-
+" }}}
 :map <F9> :call Runner()<cr>
 :map <F10> :call MakeFileBuild()<cr>
